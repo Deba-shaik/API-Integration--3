@@ -1,0 +1,138 @@
+{
+  "name": "N8N JSON Traversal Workflow",
+  "nodes": [
+    {
+      "parameters": {},
+      "type": "n8n-nodes-base.manualTrigger",
+      "typeVersion": 1,
+      "position": [
+        -224,
+        -16
+      ],
+      "id": "6c6c921b-f561-4ee0-92d6-9a219907fca8",
+      "name": "When clicking ‘Execute workflow’"
+    },
+    {
+      "parameters": {
+        "mode": "raw",
+        "jsonOutput": "\n{\n  \"receiptId\": \"REC-9988\",\n  \"customer\": {\n    \"firstName\": \"John\",\n    \"lastName\": \"Doe\",\n    \"contact\": {\n      \"email\": \"johndoe@example.com\"\n    }\n  },\n  \"purchasedItems\": [\n    {\n      \"name\": \"Wireless Mouse\",\n      \"price\": 25.99\n    },\n    {\n      \"name\": \"Mechanical Keyboard\",\n      \"price\": 89.99\n    }\n  ],\n  \"discountCode\": null\n}\n",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.set",
+      "typeVersion": 3.5,
+      "position": [
+        0,
+        -16
+      ],
+      "id": "c2ebd609-2c05-4397-b513-cd33a5000340",
+      "name": "Mock Invoice Data"
+    },
+    {
+      "parameters": {
+        "assignments": {
+          "assignments": [
+            {
+              "id": "d6b55f2f-5eae-409f-9fb8-160d4f6e72c3",
+              "name": "customerEmail",
+              "value": "={{ $json.customer.contact.email }}",
+              "type": "string"
+            },
+            {
+              "id": "2025aeb1-03c8-42f0-bd45-884dc953b3b0",
+              "name": "fullName",
+              "value": "={{ $json.customer.firstName + ' ' + $json.customer.lastName }}",
+              "type": "string"
+            },
+            {
+              "id": "64153fd5-9efe-472c-a3c0-604b1ce9bd04",
+              "name": "firstItemName",
+              "value": "={{ $json.purchasedItems[0].name }}",
+              "type": "string"
+            },
+            {
+              "id": "871d1b15-e4a5-442a-ba35-97639a51c387",
+              "name": "firstItemPrice",
+              "value": "={{ $json.purchasedItems[0].price }}",
+              "type": "number"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.set",
+      "typeVersion": 3.5,
+      "position": [
+        224,
+        -16
+      ],
+      "id": "8f9a24aa-7378-415f-b601-7c3137e22a61",
+      "name": "Extract Customer Data"
+    },
+    {
+      "parameters": {
+        "method": "POST",
+        "url": "https://jsonplaceholder.typicode.com/posts",
+        "sendBody": true,
+        "specifyBody": "json",
+        "jsonBody": "=\n{\n  \"customerEmail\": \"{{ $json.customerEmail }}\",\n  \"fullName\": \"{{ $json.fullName }}\",\n  \"firstItemName\": \"{{ $json.firstItemName }}\",\n  \"firstItemPrice\": {{ $json.firstItemPrice }}\n}\n\n",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.5,
+      "position": [
+        448,
+        -16
+      ],
+      "id": "ed364723-5899-485c-aff1-787dc7f66263",
+      "name": "HTTP_POST_SendCustomerData"
+    }
+  ],
+  "pinData": {},
+  "connections": {
+    "When clicking ‘Execute workflow’": {
+      "main": [
+        [
+          {
+            "node": "Mock Invoice Data",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Mock Invoice Data": {
+      "main": [
+        [
+          {
+            "node": "Extract Customer Data",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Extract Customer Data": {
+      "main": [
+        [
+          {
+            "node": "HTTP_POST_SendCustomerData",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    }
+  },
+  "active": false,
+  "settings": {
+    "executionOrder": "v1",
+    "binaryMode": "separate"
+  },
+  "versionId": "c2c8719b-69a4-4a5f-8e9e-717916c1ee3b",
+  "meta": {
+    "instanceId": "a03c7678428ef19ededbf912f16f7d5798ec7b9ab4c17f2a2def6a9e791e7215"
+  },
+  "nodeGroups": [],
+  "id": "PmtT7uUDYDg6Wzyv",
+  "tags": []
+}
